@@ -58,9 +58,9 @@ As a user,
 I want the system to store the data extracted from my receipts,  
 So that I can retrieve my expense records at any time.
 
-4. *User Story: Modify*  
+4. *User Story: APIs to edit, list and update*  
 As a user,  
-I want to be able to edit or delete my uploaded receipts,  
+I want to be able to edit, list, update and delete my uploaded receipts,  
 So that I can ensure the accuracy of my records and remove unnecessary entries.
 
 
