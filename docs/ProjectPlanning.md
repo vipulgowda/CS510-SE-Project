@@ -67,4 +67,18 @@ So that I can ensure the accuracy of my records and remove unnecessary entries.
 
 ## Discuss the overall structure your project will have. It's a good idea to break the project into several files in order to simplify the process of multiple people contributing to the project.
 
+The project will have distinct backend and frontend folders.
 
+1. *Backend*
+ - A app.py file for main function that invokes the server and define all the APIs.
+ - Sub folder to read receipts data using Gemini LLM and convert it into textual data.
+ - Sub folder to read textual data and store in datastore.
+ - Sub folder to write all the controllers for the APIs.
+ - Sub folder to handle database connections.
+ - Sub folder to write auth functionality.
+2. *Frontend*
+ - The frontend will contain all the boilerplate react files.
+ - The src sub folder will contain all the components, APIs, assets like images if any.
+ - The components folder will contain card component, layout, and table elements.
+ - The API folder will contain all the api files.
+ - The assets folder will contain all the images.
