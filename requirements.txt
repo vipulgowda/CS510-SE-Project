@@ -1,1 +1,7 @@
 google-cloud-datastore
+grpcio
+langchain
+langchain_google_genai
+langchain-community
+google-cloud-vision
+google-cloud-storage
