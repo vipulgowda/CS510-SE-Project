@@ -3,7 +3,7 @@ from fpdf import FPDF
 from google.cloud import storage
 import os
 import asyncio
-from cloud_vision import process_specific_file
+from core.cloud_vision import process_specific_file
 
 
 def image_to_pdf(image_filename, output_filename, bucket_name, dest_bucket_name, output_file):
