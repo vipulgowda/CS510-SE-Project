@@ -5,7 +5,7 @@ from google.cloud import vision
 import sys
 from langchain_google_genai import GoogleGenerativeAI
 from datetime import datetime
-from cloud_datastore import model_instance
+from datastore.cloud_datastore import model_instance
 import asyncio
 from concurrent.futures import ThreadPoolExecutor
 

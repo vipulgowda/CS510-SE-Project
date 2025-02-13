@@ -1,8 +1,8 @@
 from flask import Flask, request, redirect, url_for, render_template
 import os
 from dotenv import load_dotenv
-from cloud_datastore import model_instance 
-from image_to_pdf import image_to_pdf
+from datastore.cloud_datastore import model_instance 
+from core.image_to_pdf import image_to_pdf
 
 
 app = Flask(__name__)
