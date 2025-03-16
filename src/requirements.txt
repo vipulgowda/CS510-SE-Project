@@ -19,3 +19,6 @@ Werkzeug
 pytest 
 pytest-mock
 pytest-cov
+flask-cors 
+flask-login 
+requests
