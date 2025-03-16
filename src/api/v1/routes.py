@@ -1,4 +1,4 @@
-from flask import Blueprint, request, jsonify
+from flask import Blueprint, request, jsonify, session
 from services.file_service import upload_image
 from flask_cors import CORS
 from domain.receipts import (
@@ -9,8 +9,14 @@ from domain.receipts import (
     search_receipts,
     get_analytics,
 )
+import os
+import requests
 
-api = Blueprint("api", __name__)
+api = Blueprint("api", __name__, url_prefix="/v1")
+
+GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID", "")
+GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET", "")
+REDIRECT_URI = "http://localhost:3000/api/auth/callback"
 
 # Enable global CORS
 CORS(api, resources={r"/*": {"origins": "http://localhost:3000"}})
@@ -66,3 +72,57 @@ def get_analytics_api():
     """Get analytics data for receipts."""
     analytics_params = request.args.to_dict(flat=True)  # Automatically extracts all query parameters
     return jsonify(get_analytics(**analytics_params))
+
+@api.route("/v1/auth/google", methods=["GET"])
+def google_login():
+    google_auth_url = (
+        f"https://accounts.google.com/o/oauth2/auth"
+        f"?client_id={GOOGLE_CLIENT_ID}"
+        f"&redirect_uri={REDIRECT_URI}"
+        f"&response_type=code"
+        f"&scope=openid email profile"
+    )
+    return jsonify({"auth_url": google_auth_url})
+
+@api.route("/v1/auth/callback", methods=["GET"])
+def google_callback():
+    code = request.args.get("code")
+    if not code:
+        return jsonify({"error": "No authorization code provided"}), 400
+
+    token_url = "https://oauth2.googleapis.com/token"
+    token_data = {
+        "code": code,
+        "client_id": GOOGLE_CLIENT_ID,
+        "client_secret": GOOGLE_CLIENT_SECRET,
+        "redirect_uri": REDIRECT_URI,
+        "grant_type": "authorization_code",
+    }
+
+    token_response = requests.post(token_url, data=token_data)
+    token_json = token_response.json()
+
+    if "access_token" in token_json:
+        user_info = requests.get(
+            "https://www.googleapis.com/oauth2/v2/userinfo",
+            headers={"Authorization": f"Bearer {token_json['access_token']}"},
+        ).json()
+
+        session["user"] = user_info
+        session.permanent = True  # Ensure session persists
+
+        return jsonify({"user": user_info, "message": "Login successful"})
+
+    return jsonify({"error": "Invalid token response"}), 400
+
+@api.route("/v1/auth/logout", methods=["POST"])
+def logout():
+    session.pop("user", None)
+    return jsonify({"message": "Logged out successfully"})
+
+@api.route("/v1/auth/user", methods=["GET"])
+def get_user():
+    user = session.get("user")
+    if user:
+        return jsonify({"user": user})
+    return jsonify({"message": "No user logged in"}), 401
