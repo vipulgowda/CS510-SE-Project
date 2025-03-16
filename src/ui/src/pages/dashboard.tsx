@@ -8,6 +8,14 @@ export default function Dashboard() {
   const [analytics, setAnalytics] = useState<any>(null);
 
   useEffect(() => {
+    // Check authentication first
+    const stored = localStorage.getItem('authData');
+    if (!stored) {
+      window.location.href = '/login';
+      return;
+    }
+
+    // Proceed with fetching analytics if authenticated
     fetchAnalytics().then((res) => setAnalytics(res.data));
   }, []);
 

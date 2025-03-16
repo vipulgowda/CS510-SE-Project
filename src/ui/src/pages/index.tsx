@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { uploadReceipt } from "@/lib/api";
 import Navbar from "@/components/Navbar";
 import { motion, AnimatePresence } from "framer-motion";
@@ -9,6 +9,7 @@ export default function Home() {
   const [message, setMessage] = useState("");
   const [isDragging, setIsDragging] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
+  const [authData, setAuthData] = useState<any>(null);
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault();
@@ -46,6 +47,37 @@ export default function Home() {
     }
   };
 
+  useEffect(() => {
+    // Handle auth parameter from URL first
+    const urlParams = new URLSearchParams(window.location.search);
+    const authParam = urlParams.get('auth');
+    
+    if (authParam) {
+      const decodedData = JSON.parse(decodeURIComponent(authParam));
+      localStorage.setItem('authData', JSON.stringify(decodedData));
+      setAuthData(decodedData);
+      // Clean up the URL
+      window.history.replaceState({}, '', '/');
+      return; // Exit early after setting auth data from URL
+    }
+
+    // Then check localStorage
+    const stored = localStorage.getItem('authData');
+    if (stored) {
+      try {
+        const parsedData = JSON.parse(stored);
+        setAuthData(parsedData);
+      } catch (error) {
+        // If stored data is invalid, clear it and redirect
+        localStorage.removeItem('authData');
+        window.location.href = '/login';
+      }
+    } else {
+      // Redirect to login if no auth data is found
+      window.location.href = '/login';
+    }
+  }, []);
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
       <Navbar />
@@ -56,7 +88,7 @@ export default function Home() {
           className="max-w-3xl mx-auto text-center"
         >
           <h1 className="text-5xl font-bold mb-6 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-            Invoice tracker
+            Invoice tracker - {authData?.user?.name}
           </h1>
           <p className="text-xl text-gray-600 mb-12">
             Simplify your expense management with our intelligent receipt tracking system

@@ -10,6 +10,14 @@ export default function Receipts() {
   const [editForm, setEditForm] = useState<any>({});
 
   useEffect(() => {
+    // Check authentication first
+    const stored = localStorage.getItem('authData');
+    if (!stored) {
+      window.location.href = '/login';
+      return;
+    }
+
+    // Proceed with fetching receipts if authenticated
     fetchReceipts().then((res) => setReceipts(res.data));
   }, []);
 
